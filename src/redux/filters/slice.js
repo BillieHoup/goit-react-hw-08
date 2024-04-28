@@ -1,35 +1,18 @@
-import { createSelector, createSlice } from '@reduxjs/toolkit';
-import { selectContactsItems } from '../contacts/selectors';
-import { selectFilterName } from './selectors';
+import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = {
-  name: '',
-};
+const changeFilterSlice = createSlice({
+  name: "contacts",
+  initialState: {
+    name: "",
+  },
 
-const slice = createSlice({
-  name: 'filters',
-  initialState,
   reducers: {
     changeFilter(state, action) {
-      state.name = action.payload.toLowerCase();
+      state.name = action.payload;
     },
   },
 });
 
-export const { changeFilter } = slice.actions;
-export const filtersReducer = slice.reducer;
+export const { changeFilter } = changeFilterSlice.actions;
 
-export const selectFilteredContacts = createSelector(
-  [selectContactsItems, selectFilterName],
-  (contactsItems, filterName) => {
-    const reversedContacts = contactsItems.slice().reverse();
-
-    return filterName
-      ? reversedContacts.filter(
-          contact =>
-            contact.name.toLowerCase().includes(filterName.toLowerCase()) ||
-            String(contact.number).includes(filterName)
-        )
-      : reversedContacts;
-  }
-);
+export const changeFilterReducer = changeFilterSlice.reducer;

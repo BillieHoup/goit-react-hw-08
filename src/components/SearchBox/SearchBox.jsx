@@ -1,36 +1,28 @@
-import { changeFilter } from '../../redux/filters/slice';
-import { selectFilterName } from '../../redux/filters/selectors';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, useSelector } from "react-redux";
+import css from "./SearchBox.module.css";
+import { selectNameFilter } from "../../redux/filters/selectors";
+import { changeFilter } from "../../redux/filters/slice";
 
-import { GoSearch } from 'react-icons/go';
-
-import ContactCount from '../ContactCount/ContactCount';
-
-import css from './SearchBox.module.css';
-
-export default function SearchBox() {
-  const name = useSelector(selectFilterName);
+const SearchBox = () => {
+  const filter = useSelector(selectNameFilter);
   const dispatch = useDispatch();
-
-  const handleChangeFilter = e => {
-    dispatch(changeFilter(e.target.value));
+  const handleSearch = (ev) => {
+    dispatch(changeFilter(ev.target.value));
   };
-
   return (
-    <div className={css.box}>
-      <span className={css.icon}>
-        <GoSearch />
+    <label className={css.SearchBox}>
+      <span>
+        <b className={css.label}> Find contacts by name or number</b>
       </span>
       <input
-        className={css.field}
+        className={`${css.input} input`}
         type="text"
-        value={name}
-        onChange={handleChangeFilter}
-        placeholder="Search by name or number"
+        placeholder="Search for..."
+        value={filter}
+        onChange={handleSearch}
       />
-      <div className={css.contactCount}>
-        <ContactCount />
-      </div>
-    </div>
+    </label>
   );
-}
+};
+
+export default SearchBox;

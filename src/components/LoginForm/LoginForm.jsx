@@ -1,93 +1,67 @@
-import { useDispatch } from 'react-redux';
-import { logIn } from '../../redux/auth/operations';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { Link } from 'react-router-dom';
-import { useId } from 'react';
-import * as Yup from 'yup';
+import { useDispatch } from "react-redux";
+import css from "./LoginForm.module.css";
+import { logIn } from "../../redux/auth/operations";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import { loginSchema } from "../../services/yupSchemas";
+import toast from "react-hot-toast";
+import { successToast } from "../../services/toastStyles";
 
-import css from './LoginForm.module.css';
-
-const LoginFormSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Must be a valid email!')
-    .min(4, 'Must be at least 4 characters long!')
-    .max(50, 'Must be no more than 50 characters!')
-    .required('This field is required!'),
-  password: Yup.string()
-    .min(6, 'Must be at least 6 characters long!')
-    .max(30, 'Must be no more than 3 characters!')
-    .required('This field is required!'),
-});
-
-const initialValues = {
-  email: '',
-  password: '',
+const INITIAL_FORM_DATA = {
+  email: "",
+  password: "",
 };
 
-export default function LoginForm() {
-  const emailId = useId();
-  const passwordId = useId();
+export const LoginForm = () => {
   const dispatch = useDispatch();
 
-  const handleSubmit = (values, actions) => {
-    dispatch(logIn(values));
+  const handleSubmit = (data, actions) => {
+    dispatch(logIn(data))
+      .unwrap()
+      .then(() => {
+        toast.success("Loged in successfully!", {
+          style: successToast,
+        });
+      })
+      .catch(() => {
+        toast.error("This didn't work. Try again");
+      });
+
     actions.resetForm();
   };
 
   return (
     <Formik
-      initialValues={initialValues}
+      validationSchema={loginSchema}
+      initialValues={INITIAL_FORM_DATA}
       onSubmit={handleSubmit}
-      validationSchema={LoginFormSchema}
     >
-      <Form className={css.container} autoComplete="off">
-        <div className={css.form}>
-          <h2>Login Form</h2>
-
-          <div className={css.inputBox}>
-            <div className={css.inputWrapper}>
-              <Field type="email" name="email" id={emailId} placeholder=" " />
-              <label htmlFor="emailId">Email</label>
-            </div>
-            <div>
-              <ErrorMessage
-                name="email"
-                component="span"
-                className={css.errorMsg}
-              />
-            </div>
-          </div>
-
-          <div className={css.inputBox}>
-            <div className={css.inputWrapper}>
-              <Field
-                type="password"
-                name="password"
-                id={passwordId}
-                placeholder=" "
-              />
-              <label htmlFor="passwordId">Password</label>
-            </div>
-            <div>
-              <ErrorMessage
-                name="password"
-                component="span"
-                className={css.errorMsg}
-              />
-            </div>
-          </div>
-
-          <button className={css.loginBtn} type="submit">
-            Sign in account
-          </button>
-          <div className={css.orRegister}>
-            <p>Don&#39;t have an account? </p>
-            <Link to="/register">
-              <span className={css.linkRegister}>Register</span>
-            </Link>
-          </div>
-        </div>
+      <Form className={css.form}>
+        <label>
+          <span className={css.label}>Email</span>
+          <Field
+            className="input"
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            autoComplete="off"
+          />
+          <ErrorMessage className="errorMsg" name="email" component="span" />
+        </label>
+        <label>
+          <span className={css.label}>Password</span>
+          <Field
+            className="input"
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            autoComplete="off"
+          />
+          <ErrorMessage className="errorMsg" name="password" component="span" />
+        </label>
+        <button className="button-64" type="submit">
+          <span>Log In</span>
+        </button>
       </Form>
     </Formik>
   );
-}
+};

@@ -1,113 +1,70 @@
-import { useDispatch } from 'react-redux';
-import { register } from '../../redux/auth/operations';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { Link } from 'react-router-dom';
-import { useId } from 'react';
-import * as Yup from 'yup';
+import { useDispatch } from "react-redux";
+import css from "./RegistrationForm.module.css";
+import { register } from "../../redux/auth/operations";
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import { registerSchema } from "../../services/yupSchemas";
 
-import css from './RegistrationForm.module.css';
-
-const RegistrationFormSchema = Yup.object().shape({
-  name: Yup.string()
-    .min(3, 'Must be at least 3 characters long!')
-    .max(30, 'Must be no more than 30 characters!')
-    .required('This field is required!'),
-  email: Yup.string()
-    .email('Must be a valid email!')
-    .min(4, 'Must be at least 4 characters long!')
-    .max(50, 'Must be no more than 50 characters!')
-    .required('This field is required!'),
-  password: Yup.string()
-    .min(6, 'Must be at least 6 characters long!')
-    .max(30, 'Must be no more than 3 characters!')
-    .required('This field is required!'),
-});
-
-const initialValues = {
-  name: '',
-  email: '',
-  password: '',
+const INITIAL_FORM_DATA = {
+  name: "",
+  email: "",
+  password: "",
 };
 
-export default function RegistrationForm() {
-  const nameId = useId();
-  const emailId = useId();
-  const passwordId = useId();
+export const RegistrationForm = () => {
   const dispatch = useDispatch();
 
-  const handleSubmit = (credentials, actions) => {
-    dispatch(register(credentials));
+  const handleSubmit = (data, actions) => {
+    dispatch(register(data));
     actions.resetForm();
   };
 
   return (
     <Formik
-      initialValues={initialValues}
+      validationSchema={registerSchema}
+      initialValues={INITIAL_FORM_DATA}
       onSubmit={handleSubmit}
-      validationSchema={RegistrationFormSchema}
     >
-      <Form className={css.container} autoComplete="off">
-        <div className={css.form}>
-          <h2>Registration Form</h2>
+      <Form className={css.form}>
+        <label>
+          <span className={css.label}>Username</span>
+          <Field
+            className="input"
+            type="text"
+            name="name"
+            placeholder="Enter your name"
+            autoComplete="off"
+          />
+          <ErrorMessage className="errorMsg" name="name" component="span" />
+        </label>
 
-          <div className={css.inputBox}>
-            <div className={css.inputWrapper}>
-              <Field type="text" name="name" id={nameId} placeholder=" " />
-              <label htmlFor="nameId">Your name</label>
-            </div>
-            <div>
-              <ErrorMessage
-                name="name"
-                component="span"
-                className={css.errorMsg}
-              />
-            </div>
-          </div>
+        <label>
+          <span className={css.label}>Email</span>
+          <Field
+            className="input"
+            type="email"
+            name="email"
+            placeholder="Enter your email"
+            autoComplete="off"
+          />
+          <ErrorMessage className="errorMsg" name="email" component="span" />
+        </label>
 
-          <div className={css.inputBox}>
-            <div className={css.inputWrapper}>
-              <Field type="email" name="email" id={emailId} placeholder=" " />
-              <label htmlFor="emailId">Email</label>
-            </div>
-            <div>
-              <ErrorMessage
-                name="email"
-                component="span"
-                className={css.errorMsg}
-              />
-            </div>
-          </div>
+        <label>
+          <span className={css.label}>Password</span>
+          <Field
+            className="input"
+            type="password"
+            name="password"
+            placeholder="Enter password"
+            autoComplete="off"
+          />
+          <ErrorMessage className="errorMsg" name="password" component="span" />
+        </label>
 
-          <div className={css.inputBox}>
-            <div className={css.inputWrapper}>
-              <Field
-                type="password"
-                name="password"
-                id={passwordId}
-                placeholder=" "
-              />
-              <label htmlFor="passwordId">Password</label>
-            </div>
-            <div>
-              <ErrorMessage
-                name="password"
-                component="span"
-                className={css.errorMsg}
-              />
-            </div>
-          </div>
-
-          <button className={css.registerBtn} type="submit">
-            Create account
-          </button>
-          <div className={css.orLogin}>
-            <p>Already have an account? </p>
-            <Link to="/login">
-              <span className={css.linkLogin}>Login</span>
-            </Link>
-          </div>
-        </div>
+        <button className="button-64" type="submit">
+          <span>Register</span>
+        </button>
       </Form>
     </Formik>
   );
-}
+};

@@ -1,12 +1,23 @@
-.navigation {
-  display: flex;
-  gap: 10px;
+.nav {
+  padding: 10px 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  justify-content: space-between;
+  width: 100%;
+  background-color: var(--bg);
+  border-radius: 2px;
 }
 
-.isActive {
-  font-weight: 700;
-  background-image: linear-gradient(-90deg, #41aae8, #41c5d5);
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+.link {
+  color: var(--text-dark);
+  text-decoration: none;
+  padding: 2px;
+  margin: 0 auto;
+}
+
+.active {
+  color: var(--primary-brand);
+  font-weight: bold;
+  border-left: 1px solid var(--decor);
+  border-bottom: 1px solid var(--decor);
 }

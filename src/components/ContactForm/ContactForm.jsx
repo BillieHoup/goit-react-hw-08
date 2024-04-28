@@ -1,101 +1,84 @@
-import { useDispatch } from 'react-redux';
-import { addContact } from '../../redux/contacts/operations';
-import { Formik, Form, Field, ErrorMessage } from 'formik';
-import { useId } from 'react';
-import * as Yup from 'yup';
+import { ErrorMessage, Field, Form, Formik } from "formik";
+import css from "./ContactForm.module.css";
+import { useDispatch, useSelector } from "react-redux";
+import { addContact } from "../../redux/contacts/operations";
+import { contactsSchema } from "../../services/yupSchemas";
+import { selectFilteredContacts } from "../../redux/contacts/selectors";
+import toast, { Toaster } from "react-hot-toast";
+import { styleToastMessage, successToast } from "../../services/toastStyles";
 
-import { IoMdAddCircleOutline } from 'react-icons/io';
-
-import css from './ContactForm.module.css';
-
-const ContactFormSchema = Yup.object().shape({
-  contactName: Yup.string()
-    .min(3, 'Must be at least 3 characters long!')
-    .max(30, 'Must be no more than 30 characters!')
-    .required('This field is required!'),
-  phoneNumber: Yup.string()
-    .min(3, 'Must be at least 3 characters long!')
-    .max(30, 'Must be no more than 30 characters!')
-    .required('This field is required!'),
-});
-
-const initialValues = {
-  contactName: '',
-  phoneNumber: '',
+const INITIAL_FORM_DATA = {
+  name: "",
+  number: "",
 };
 
-export default function ContactForm() {
-  const contactNameId = useId();
-  const phoneNumberId = useId();
+const ContactForm = () => {
+  const visibleContacts = useSelector(selectFilteredContacts);
   const dispatch = useDispatch();
-
-  const handleSubmit = (values, actions) => {
-    const { contactName, phoneNumber } = values;
-    dispatch(addContact({ name: contactName, number: phoneNumber }));
+  const handleSubmit = (data, actions) => {
+    if (
+      visibleContacts.some(
+        (el) => el.name.trim().toLowerCase() === data.name.trim().toLowerCase()
+      )
+    ) {
+      toast(`You already have a contact with name ${data.name}`, {
+        duration: 3000,
+        style: styleToastMessage,
+      });
+      return;
+    } else if (
+      visibleContacts.some((el) => el.number.trim() === data.number.trim())
+    ) {
+      toast(`You already have a contact with number ${data.number}`, {
+        duration: 3000,
+        style: styleToastMessage,
+      });
+      return;
+    } else {
+      dispatch(addContact(data));
+      toast.success("Contact successfully added!", {
+        style: successToast,
+      });
+    }
     actions.resetForm();
   };
 
   return (
     <Formik
-      initialValues={initialValues}
+      validationSchema={contactsSchema}
+      initialValues={INITIAL_FORM_DATA}
       onSubmit={handleSubmit}
-      validationSchema={ContactFormSchema}
     >
-      {({ setFieldValue }) => (
-        <Form autoComplete="off">
-          <div className={css.addContact}>
-            <h2>New contact</h2>
-            <div className={css.inputBox}>
-              <div className={css.inputWrapper}>
-                <Field
-                  type="text"
-                  name="contactName"
-                  id={contactNameId}
-                  placeholder=" "
-                />
-                <label htmlFor={contactNameId}>Name</label>
-              </div>
-              <div>
-                <ErrorMessage
-                  name="contactName"
-                  component="span"
-                  className={css.errorMsg}
-                />
-              </div>
-            </div>
-
-            <div className={css.inputBox}>
-              <div className={css.inputWrapper}>
-                <Field
-                  type="text"
-                  name="phoneNumber"
-                  id={phoneNumberId}
-                  placeholder=" "
-                  onChange={e => {
-                    const filteredValue = e.target.value.replace(/[^\d-]/g, '');
-                    setFieldValue('phoneNumber', filteredValue);
-                  }}
-                />
-                <label htmlFor={phoneNumberId}>Phone Number</label>
-              </div>
-              <div>
-                <ErrorMessage
-                  name="phoneNumber"
-                  component="span"
-                  className={css.errorMsg}
-                />
-              </div>
-            </div>
-
-            <button className={css.addContactBtn} type="submit">
-              <div className={css.textBtn}>
-                <IoMdAddCircleOutline className={css.iconBtn} />
-                Add contact
-              </div>
-            </button>
-          </div>
-        </Form>
-      )}
+      <Form className={css.form}>
+        <label>
+          <span className={css.label}>Name</span>
+          <Field
+            className="input"
+            type="text"
+            name="name"
+            placeholder="Enter contact name"
+            autoComplete="off"
+          />
+          <ErrorMessage className="errorMsg" name="name" component="span" />
+        </label>
+        <label>
+          <span className={css.label}>Phone</span>
+          <Field
+            className="input"
+            type="text"
+            name="number"
+            placeholder="000-000-0000"
+            autoComplete="off"
+          />
+          <ErrorMessage className="errorMsg" name="number" component="span" />
+        </label>
+        <button className={`${css.btn} button-64`} type="submit">
+          <span>Add contact</span>
+        </button>
+        <Toaster position="top-center" reverseOrder={false} />
+      </Form>
     </Formik>
   );
-}
+};
+
+export default ContactForm;

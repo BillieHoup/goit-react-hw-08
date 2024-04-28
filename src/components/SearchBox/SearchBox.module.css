@@ -1,35 +1,22 @@
-.box {
-  display: flex;
-  position: relative;
-  font-size: 14px;
+.label {
+  color: var(--text-dark);
+  font-size: 20px;
+  font-style: italic;
 }
 
-.icon {
-  position: absolute;
-  top: 56%;
-  transform: translateY(-50%);
-  left: 10px;
-  color: #31343e;
+.label,
+.input {
+  display: block;
+  margin-right: auto;
 }
 
-.field {
-  padding: 8px 150px 8px 34px;
-  width: 100%;
-  border-radius: 3px;
-  border: 1px solid #31343e;
-  color: #31343e;
-  background-color: transparent;
-}
+@media screen and (min-width: 768px) {
+  .SearchBox {
+    padding: 4px;
+    border-radius: 2px;
+  }
 
-.field::placeholder {
-  color: #31343e;
-}
-
-.contactCount {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  transform: translateY(-50%);
-  cursor: default;
-  font-size: 12px;
+  .label {
+    color: var(--text-light);
+  }
 }
